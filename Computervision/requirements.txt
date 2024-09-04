@@ -4,4 +4,4 @@ face_recognition
 numpy
 tensorflow
 keras
-
+cmake
