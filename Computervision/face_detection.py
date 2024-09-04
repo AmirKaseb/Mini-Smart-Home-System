@@ -19,7 +19,7 @@ def extract_name(image_path):
 # Loads all images in directory
 def load_image():
     # Specify the directory containing known face images
-    folder_dir = Path(r"C:\Users\Administrator\Desktop\Known")  # Default directory
+    folder_dir = Path(r"./Database")  # Default directory
     
     known_face_encodings = []
     known_face_names = []
