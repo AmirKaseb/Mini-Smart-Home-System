@@ -1,0 +1,1 @@
+# Mini-Smart-Home-System
