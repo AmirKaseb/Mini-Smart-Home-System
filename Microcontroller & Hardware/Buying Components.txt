@@ -1,0 +1,32 @@
+ATMEGA8A-PU 8KB 2.7V~5.5V AVR 1KB 16MHz FLASH 23 DIP-28 AVR Microcontroller Unit
+KeyPad 4×4
+Magnetic Buzzer 5V 12mm 2 Pin
+NTC Thermistor 10K ±5% 3950K P=1.7mm (MF52A103J3950)
+PIR Sensor SR501
+Photo Resistor Sensor LDR 7mm GL7528 8kΩ~20kΩ P=5mm
+RGB Clear LED Common Cathode 5mm
+DC Motor R280 3-12V 13750RPM
+Plastic Propeller 4 Blades 100mm
+L293D Quadruple Half-H Driver DIP-16
+Oval Red LED 3.8x5mm
+Micro Servo SG90 0:180 Degree
+
+Battery (9V?)
+
+Resistors (220 - 1k - 10k - 5.1K)
+Capacitors (22pF - 0.1uF - 1uF - 4.7uF - [10uF Electrolytic])
+
+Crystal 16.000MHz
+Push Button 4 pins and 2 pins
+
+USB / UART : CH9102 Chip USB to TTL (Serial) Converter
+
+Jumpers (Wires)
+
+2 breadboards
+
+Avometer
+
+Arduino
+
+~(Voltage Regulator - Diode)

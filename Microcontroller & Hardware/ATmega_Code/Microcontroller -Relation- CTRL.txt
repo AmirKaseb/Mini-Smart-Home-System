@@ -1,0 +1,80 @@
+Read/Receiving:
+
+
+void ctrl(){
+
+  if (Serial.available() > 0) {
+    char msg[32] = "";
+    int len = Serial.readBytes(msg, sizeof(msg) - 1); //msg buffer
+    msg[len] = '\0'; 
+
+    if (strcmp(msg, "open") == 0 && !doorOpen) {
+      Serial.print("Opening Door\n");
+      openCloseDoor();
+      
+    } 
+    else if (strcmp(msg, "change") == 0) {
+        delay(5000);
+        if (Serial.available() > 0) {
+            len = Serial.readBytes(msg, sizeof(msg) - 1); 
+            msg[len] = '\0'; 
+            
+            if (strlen(msg) <30) {
+              strcpy(Master, msg); //Copy new password to Master
+              PW_Len = strlen(msg);  
+              Serial.print("Password Changed!\n");
+            }
+          else {
+            Serial.print("Password Too Long!\n");
+          }
+        }
+    }
+
+    else if (strcmp(msg, "lock")==0) {
+      sysUnlock=0;
+      digitalWrite(LED,LOW);
+      analogWrite(EN, 0);
+      setLED('0');
+      Serial.print("System Locked!\n");
+    }
+  
+  }
+  
+}
+
+
+Write/Sending:
+
+// If system (house) is locked (hasn't been open before) and the PIR detected someone, do the following
+if (!sysUnlock){
+  	byte motionStatus = digitalRead(motionPin);
+    if (motionStatus){
+      	//
+      	//SEND To Control Interface Too//
+      	//
+    	Serial.print("WARNING: Intruder\n");		
+    }
+  }
+
+//////
+
+// If the keypad is being pressed to the length of the current password
+if (data_count==PW_Len){
+  
+    if(!strcmp(Data, Master)){
+      Serial.print("Correct Password\n");
+      Serial.print("Opening Door\n");
+      openCloseDoor();
+      
+      delay(1000);
+      }
+    else{
+      //
+      //SEND To Control Interface Too//
+      //
+      Serial.print("Incorrect Password\n");
+      tone(BUZZ, 300, 500);
+      
+      delay(1000);
+      }
+  
