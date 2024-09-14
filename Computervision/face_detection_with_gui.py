@@ -4,7 +4,6 @@ import cv2
 import face_recognition
 import flet as ft
 import base64
-from io import BytesIO
 import asyncio
 
 ###################################
