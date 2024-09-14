@@ -1,0 +1,8 @@
+These pins are ones to have external pinheaders.
+
+"MOSI"
+"MISO"
+"SCK"
+"GND"
+"VCC"
+"RESET"

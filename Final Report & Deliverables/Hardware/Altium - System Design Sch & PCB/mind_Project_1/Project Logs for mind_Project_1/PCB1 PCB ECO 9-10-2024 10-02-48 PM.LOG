@@ -1,0 +1,10 @@
+Removed Pin From Net: NetName=MISO Pin=J1-1
+Removed Pin From Net: NetName=MOSI Pin=J1-2
+Removed Pin From Net: NetName=D8 Pin=J2-1
+Removed Pin From Net: NetName=D9 Pin=J2-2
+Added Pin To Net: NetName=D8 Pin=J1-1
+Added Pin To Net: NetName=D9 Pin=J1-2
+Added Pin To Net: NetName=MOSI Pin=J2-1
+Added Pin To Net: NetName=MISO Pin=J2-2
+Added Member To Class: ClassName=Sheet1 Member=Component BUZ1 Buzzer
+Added Member To Class: ClassName=Sheet1 Member=Component Y1 Crystal 16Mhz

@@ -1,0 +1,30 @@
+Added Component: Designator=J3(6P 2mm Pin header)
+Add component (AddParameter): Name = "Manufacturer"; Value = "TE Connectivity AMP Connectors"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer Part Number"; Value = "2355172-6"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier"; Value = "DigiKey"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier Part Number"; Value = "17-2355172-6-ND"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=D2 Pin=J3-1
+Added Pin To Net: NetName=D2 Pin=U2-32
+Added Net: Name=D2
+Added Pin To Net: NetName=D3 Pin=J3-2
+Added Pin To Net: NetName=D3 Pin=U2-1
+Added Net: Name=D3
+Added Pin To Net: NetName=D4 Pin=J3-3
+Added Pin To Net: NetName=D4 Pin=U2-2
+Added Net: Name=D4
+Added Pin To Net: NetName=D5 Pin=J3-4
+Added Pin To Net: NetName=D5 Pin=U2-9
+Added Net: Name=D5
+Added Pin To Net: NetName=D6 Pin=J3-5
+Added Pin To Net: NetName=D6 Pin=U2-10
+Added Net: Name=D6
+Added Pin To Net: NetName=D7 Pin=J3-6
+Added Pin To Net: NetName=D7 Pin=U2-11
+Added Net: Name=D7
+Added Pin To Net: NetName=D8 Pin=J2-1
+Added Pin To Net: NetName=D8 Pin=U2-12
+Added Net: Name=D8
+Added Pin To Net: NetName=D9 Pin=J2-2
+Added Pin To Net: NetName=D9 Pin=U2-13
+Added Net: Name=D9
+Added Member To Class: ClassName=Sheet1 Member=Component J3 6P 2mm Pin Headers

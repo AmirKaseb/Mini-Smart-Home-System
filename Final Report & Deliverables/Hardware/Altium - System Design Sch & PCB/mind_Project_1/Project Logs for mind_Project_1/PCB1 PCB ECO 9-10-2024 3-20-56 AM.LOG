@@ -1,0 +1,17 @@
+Removed Pin From Net: NetName=MOTOR Pin=J1-1
+Removed Pin From Net: NetName=MOTOR_2 Pin=J1-2
+Removed Pin From Net: NetName=MISO Pin=J2-3
+Removed Pin From Net: NetName=MOSI Pin=J2-4
+Added Pin To Net: NetName=MISO Pin=J1-1
+Added Pin To Net: NetName=MOSI Pin=J1-2
+Added Pin To Net: NetName=MOTOR Pin=J2-3
+Added Pin To Net: NetName=MOTOR_2 Pin=J2-4
+Add Pin To Net: Unknown Pin: Pin KP1-1
+Add Pin To Net: Unknown Pin: Pin KP1-2
+Add Pin To Net: Unknown Pin: Pin KP1-3
+Add Pin To Net: Unknown Pin: Pin KP1-4
+Add Pin To Net: Unknown Pin: Pin KP1-5
+Add Pin To Net: Unknown Pin: Pin KP1-6
+Add Pin To Net: Unknown Pin: Pin KP1-7
+Add Pin To Net: Unknown Pin: Pin KP1-8
+Add Class Member: Failed to add class member : Component KP1 Keypad 4*4
