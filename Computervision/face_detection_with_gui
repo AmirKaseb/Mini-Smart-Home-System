@@ -310,6 +310,8 @@ async def process_gui(page: ft.Page):
                 if delete_person(name, folder_path):  # Function to delete the person
                     known_face_encodings, known_face_names = load_image(folder_path)  # Reload face data
                     show_bottom_sheet(page, f"{name} deleted from the database")  # Show bottom sheet message
+                    global known_face_encodings, known_face_names
+                    known_face_encodings, known_face_names = load_image(folder_path)
             else:
                 show_bottom_sheet(page, f"{name} was not deleted from the database")  # Show bottom sheet message
 
