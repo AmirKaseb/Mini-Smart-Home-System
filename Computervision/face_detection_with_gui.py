@@ -4,13 +4,15 @@ import cv2
 import face_recognition
 import flet as ft
 import base64
+import serial 
+import time
 # from io import BytesIO
 import asyncio
 
 ###################################
 # Initialization 
 
-folder_path = Path(r"C:\Users\Administrator\Desktop\Known")  # Default directory
+folder_path = Path(r"./Database")  # Default directory
 cam = cv2.VideoCapture(0)
 
 ###################################
@@ -130,7 +132,7 @@ def processTerminal():
 
         # Initialize `face_detected` to False and set default name to 'Unknown'
         face_detected = False
-        name = "Unknown"  # Default name for unidentified faces
+        name = "Unknown" 
 
         # Compare detected faces with known faces
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
@@ -182,9 +184,59 @@ def processTerminal():
 # Pass the camera instance to the add_clicked function
 async def process_gui(page: ft.Page):
     global video_container, cap
-    global open_button, add_button, delete_button, reset_button
-    global open_button_container, add_button_container, delete_button_container, reset_button_container
+    global open_button, add_button, delete_button, reset_button, lock_button
+    global open_button_container, add_button_container, delete_button_container, reset_button_container, lock_button_container
+    global open_clicked
+
+    def home_layout():
+        # Re-add the buttons
+        page.controls.clear()  # Clear all controls again
+
+        # Center the video container and buttons
+        button_row1 = ft.Row(
+            controls=[open_button_container, lock_button_container],
+            alignment=ft.MainAxisAlignment.CENTER
+        )
+        button_row2 = ft.Row(
+            controls=[add_button_container, delete_button_container],
+            alignment=ft.MainAxisAlignment.CENTER
+        )
+        button_row3 = ft.Row(
+            controls=[reset_button_container],
+            alignment=ft.MainAxisAlignment.CENTER
+        )
+        main_column = ft.Column(
+            controls=[video_container, button_row1, button_row2, button_row3],
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+        )
+
+        # Add the main column to the page
+        page.add(main_column)
+        page.update()
     
+    def req_layout(input_info, button1, button2):
+        # Create a row for buttons and ensure the row is centered
+        button_row1 = ft.Row(
+            controls=[button1],
+            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
+        )
+        button_row2 = ft.Row(
+            controls=[button2],
+            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
+        )
+
+        # Organize the video container, dropdown, and button in a centered column
+        main_column = ft.Column(
+            controls=[video_container, input_info, button_row1, button_row2],
+            alignment=ft.MainAxisAlignment.CENTER,  # Center the column vertically
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER  # Center the column horizontally
+        )
+
+        # Add the main column to the page
+        page.add(main_column)
+        page.update()  # Update the page to show the new elements
+
     def show_bottom_sheet(page, message):
         bs = ft.BottomSheet(
             content=ft.Container(
@@ -215,6 +267,20 @@ async def process_gui(page: ft.Page):
                     actions_alignment=ft.MainAxisAlignment.END,
                 )
                 page.open(confirmation_dlg)  # Open the alert dialog
+                    # THIS IS THE START of the opening function of the door 
+
+                    # Set up the serial connection
+                ser = serial.Serial('COM4', 9600, timeout=1)  # Replace 'COM3' with your serial port
+                
+                # Allow the connection to initialize
+                time.sleep(2)
+                
+                # Send the "Open" message
+                ser.write(b'open')  # 'b' is for sending bytes
+                
+                # Close the serial connection
+                ser.close()
+                # THIS IS THE END of the opening function of the door
             else:
                 # Show a cancellation message in an alert dialog
                 confirmation_dlg = ft.AlertDialog(
@@ -234,6 +300,62 @@ async def process_gui(page: ft.Page):
             modal=True,
             title=ft.Text("Please confirm"),
             content=ft.Text("Are you sure you want to open the door?"),
+            actions=[
+                ft.TextButton("Yes", on_click=handle_modal_close),
+                ft.TextButton("No", on_click=handle_modal_close),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+
+        # Open the confirmation modal dialog
+        page.open(dlg_modal)
+
+    def lock_clicked(e):
+        # Define the confirmation modal dialog
+        def handle_modal_close(e):
+            if e.control.text == "Yes":
+                # Show a confirmation message in an alert dialog
+                confirmation_dlg = ft.AlertDialog(
+                    title=ft.Text("Door has been locked."),
+                    actions=[
+                        ft.TextButton("OK", on_click=lambda _: page.close(confirmation_dlg)),
+                    ],
+                    actions_alignment=ft.MainAxisAlignment.END,
+                )
+                page.open(confirmation_dlg)  # Open the alert dialog
+                    # THIS IS THE START of the opening function of the door 
+
+                    # Set up the serial connection
+                ser = serial.Serial('COM4', 9600, timeout=1)  # Replace 'COM3' with your serial port
+                
+                # Allow the connection to initialize
+                time.sleep(2)
+                
+                # Send the "Open" message
+                ser.write(b'lock')  # 'b' is for sending bytes
+                
+                # Close the serial connection
+                ser.close()
+                # THIS IS THE END of the opening function of the door
+            else:
+                # Show a cancellation message in an alert dialog
+                confirmation_dlg = ft.AlertDialog(
+                    title=ft.Text("Door remains opened."),
+                    actions=[
+                        ft.TextButton("OK", on_click=lambda _: page.close(confirmation_dlg)),
+                    ],
+                    actions_alignment=ft.MainAxisAlignment.END,
+                )
+                page.open(confirmation_dlg)  # Open the alert dialog
+            
+            # Close the confirmation modal dialog
+            page.close(dlg_modal)
+
+        # Define the confirmation modal dialog
+        dlg_modal = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Please confirm"),
+            content=ft.Text("Are you sure you want to lock the door?"),
             actions=[
                 ft.TextButton("Yes", on_click=handle_modal_close),
                 ft.TextButton("No", on_click=handle_modal_close),
@@ -264,80 +386,22 @@ async def process_gui(page: ft.Page):
                     file_path = path_from_name(name, folder_path)
                     cv2.imwrite(file_path, clean_frame)
                     show_bottom_sheet(page, f"Person added as {name}")
-                    global known_face_encodings, known_face_names
-                    known_face_encodings, known_face_names = load_image(folder_path)
                 else:
                     show_bottom_sheet(page, "Error: Unable to capture image.")
 
-                # Re-add the buttons after the process is done
-                page.controls.clear()  # Clear all controls again
-                # Center the video container and buttons
-                button_row1 = ft.Row(
-                    controls=[open_button_container, add_button_container],
-                    alignment=ft.MainAxisAlignment.CENTER
-                )
-                button_row2 = ft.Row(
-                    controls=[delete_button_container, reset_button_container],
-                    alignment=ft.MainAxisAlignment.CENTER
-                )
-                main_column = ft.Column(
-                    controls=[video_container, button_row1, button_row2],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                )
+                home_layout()
 
-                # Add the main column to the page
-                page.add(main_column)
-                page.update()
             else:
                 show_bottom_sheet(page, "Error: No name entered.")
                 
         def back_handler(e):
-            # Re-add the buttons after the process is done
-            page.controls.clear()  # Clear all controls again
-            # Center the video container and buttons
-            button_row1 = ft.Row(
-                controls=[open_button_container, add_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            button_row2 = ft.Row(
-                controls=[delete_button_container, reset_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            main_column = ft.Column(
-                controls=[video_container, button_row1, button_row2],
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            )
-
-            # Add the main column to the page
-            page.add(main_column)
-            page.update()
+            home_layout()
 
         # Add the input field and submit button to the page
         submit_button = ft.ElevatedButton("Submit", on_click=submit_handler)
         back_button = ft.ElevatedButton("Back", on_click=back_handler)
-        
-        # Create a row for buttons and ensure the row is centered
-        button_row1 = ft.Row(
-            controls=[submit_button],
-            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
-        )
-        button_row2 = ft.Row(
-            controls=[back_button],
-            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
-        )
 
-        # Organize the video container, dropdown, and button in a centered column
-        main_column = ft.Column(
-            controls=[video_container, name_field, button_row1, button_row2],
-            alignment=ft.MainAxisAlignment.CENTER,  # Center the column vertically
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER  # Center the column horizontally
-        )
-
-        # Add the main column to the page
-        page.add(main_column)
-        page.update()  # Update the page to show the new elements        page.update()
+        req_layout(name_field, submit_button, back_button)
 
     def delete_clicked(e):
         # Clear all buttons before proceeding
@@ -360,33 +424,11 @@ async def process_gui(page: ft.Page):
                 if delete_person(name, folder_path):  # Function to delete the person
                     known_face_encodings, known_face_names = load_image(folder_path)  # Reload face data
                     show_bottom_sheet(page, f"{name} deleted from the database")  # Show bottom sheet message
-                    known_face_encodings, known_face_names
-                    known_face_encodings, known_face_names = load_image(folder_path)
             else:
                 show_bottom_sheet(page, f"{name} was not deleted from the database")  # Show bottom sheet message
 
             page.close(dlg_modal)  # Close modal dialog
-
-            # Re-add the buttons after the process is done
-            page.controls.clear()  # Clear all controls again
-            # Center the video container and buttons
-            button_row1 = ft.Row(
-                controls=[open_button_container, add_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            button_row2 = ft.Row(
-                controls=[delete_button_container, reset_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            main_column = ft.Column(
-                controls=[video_container, button_row1, button_row2],
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            )
-
-            # Add the main column to the page
-            page.add(main_column)
-            page.update()
+            home_layout()
 
         # Define the confirmation modal dialog
         dlg_modal = ft.AlertDialog(
@@ -408,50 +450,13 @@ async def process_gui(page: ft.Page):
                 show_bottom_sheet(page, "Please select a person to delete.")  # Show a message if no name is selected
                 
         def back_handler(e):
-            # Re-add the buttons after the process is done
-            page.controls.clear()  # Clear all controls again
-            # Center the video container and buttons
-            button_row1 = ft.Row(
-                controls=[open_button_container, add_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            button_row2 = ft.Row(
-                controls=[delete_button_container, reset_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            main_column = ft.Column(
-                controls=[video_container, button_row1, button_row2],
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            )
-            
-            # Add the main column to the page
-            page.add(main_column)
-            page.update()
+            home_layout()
 
         # Add the dropdown and submit button to the page
         submit_button = ft.ElevatedButton("Submit", on_click=submit_handler)
         back_button = ft.ElevatedButton("Back", on_click=back_handler)
         
-        # Create a row for buttons and ensure the row is centered
-        button_row1 = ft.Row(
-            controls=[submit_button],
-            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
-        )
-        button_row2 = ft.Row(
-            controls=[back_button],
-            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
-        )
-        # Organize the video container, dropdown, and button in a centered column
-        main_column = ft.Column(
-            controls=[video_container, dropdown, button_row1, button_row2],
-            alignment=ft.MainAxisAlignment.CENTER,  # Center the column vertically
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER  # Center the column horizontally
-        )
-
-        # Add the main column to the page
-        page.add(main_column)
-        page.update()  # Update the page to show the new elements
+        req_layout(dropdown, submit_button, back_button)
 
     def reset_clicked(e):
         # Clear all buttons before proceeding
@@ -462,6 +467,17 @@ async def process_gui(page: ft.Page):
             if e.control.text == "Yes":
                 new_password = password_field.value
                 if new_password:
+                    # THIS IS THE START of the opening function of the door
+                        # Set up the serial connection
+                    ser = serial.Serial('COM4', 9600, timeout=1)  # Replace 'COM3' with your serial port
+                    # Allow the connection to initialize
+                    time.sleep(2)
+                    # Send the "Open" message
+                    ser.write(b'change')  # 'b' is for sending bytes
+                    time.sleep(2)   
+                    ser.write(new_password.encode('utf-8'))        # Close the serial connection
+                    ser.close()
+                    # THIS IS THE END of the opening function of the door
                     # Show the result in an alert dialog
                     result_dlg = ft.AlertDialog(
                         title=ft.Text("Password has been updated."),
@@ -493,27 +509,7 @@ async def process_gui(page: ft.Page):
                 page.open(result_dlg)  # Open the alert dialog with the success message
             
             page.close(dlg_modal)
-
-            # Re-add the buttons after the process is done
-            page.controls.clear()  # Clear all controls again
-            # Center the video container and buttons
-            button_row1 = ft.Row(
-                controls=[open_button_container, add_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            button_row2 = ft.Row(
-                controls=[delete_button_container, reset_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            main_column = ft.Column(
-                controls=[video_container, button_row1, button_row2],
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            )
-
-            # Add the main column to the page
-            page.add(main_column)
-            page.update()
+            home_layout()
 
         # Define the confirmation modal dialog
         dlg_modal = ft.AlertDialog(
@@ -538,26 +534,7 @@ async def process_gui(page: ft.Page):
                 show_bottom_sheet(page, "Please type in a password.")
                 
         def back_handler(e):
-            # Re-add the buttons after the process is done
-            page.controls.clear()  # Clear all controls again
-            # Center the video container and buttons
-            button_row1 = ft.Row(
-                controls=[open_button_container, add_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            button_row2 = ft.Row(
-                controls=[delete_button_container, reset_button_container],
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-            main_column = ft.Column(
-                controls=[video_container, button_row1, button_row2],
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            )
-            
-            # Add the main column to the page
-            page.add(main_column)
-            page.update()
+            home_layout()
 
         # Add the password input field and submit button to the page
         password_field = ft.TextField(label="Enter Password", width=310)
@@ -565,26 +542,7 @@ async def process_gui(page: ft.Page):
         submit_button = ft.ElevatedButton("Submit", on_click=submit_handler)
         back_button = ft.ElevatedButton("Back", on_click=back_handler)
 
-        # Create a row for buttons and ensure the row is centered
-        button_row1 = ft.Row(
-            controls=[submit_button],
-            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
-        )
-        button_row2 = ft.Row(
-            controls=[back_button],
-            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
-        )
-        # Organize the video container, dropdown, and button in a centered column
-        main_column = ft.Column(
-            controls=[video_container, password_field, button_row1, button_row2],
-            alignment=ft.MainAxisAlignment.CENTER,  # Center the column vertically
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER  # Center the column horizontally
-        )
-
-        # Add the main column to the page
-        page.add(main_column)
-        page.update()  # Update the page to show the new elements        page.add(password_field, submit_button)
-
+        req_layout(password_field, submit_button, back_button)
 
     button_width = 150
     # Create buttons
@@ -612,35 +570,25 @@ async def process_gui(page: ft.Page):
         bgcolor=ft.colors.BLUE_300,
         color=ft.colors.WHITE
     )
+    lock_button = ft.ElevatedButton(
+        text="Lock Door",
+        on_click=lock_clicked,
+        bgcolor=ft.colors.GREEN_300,
+        color=ft.colors.WHITE
+    )
 
     # Create containers for buttons
     open_button_container = ft.Container(open_button, width=button_width)
     add_button_container = ft.Container(add_button, width=button_width)
     delete_button_container = ft.Container(delete_button, width=button_width)
     reset_button_container = ft.Container(reset_button, width=button_width)
+    lock_button_container = ft.Container(lock_button, width=button_width)
 
     # Create a video container
     global video_container
     video_container = ft.Container(width=310, height=240)
 
-    # Center the video container and buttons
-    button_row1 = ft.Row(
-        controls=[open_button_container, add_button_container],
-        alignment=ft.MainAxisAlignment.CENTER
-    )
-    button_row2 = ft.Row(
-        controls=[delete_button_container, reset_button_container],
-        alignment=ft.MainAxisAlignment.CENTER
-    )
-    main_column = ft.Column(
-        controls=[video_container, button_row1, button_row2],
-        alignment=ft.MainAxisAlignment.CENTER,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER
-    )
-
-    # Add the main column to the page
-    page.add(main_column)
-    page.update()
+    home_layout()
 
     # Start video feed update task
     cap = cv2.VideoCapture(0)  # Initialize camera capture
@@ -648,6 +596,8 @@ async def process_gui(page: ft.Page):
 
 async def update_frame(video_container, page, cap):
     global open_button, add_button
+    global open_clicked
+
     known_face_encodings, known_face_names = load_image(folder_path)
     while True:
         ret, frame = cap.read()
@@ -680,34 +630,49 @@ async def update_frame(video_container, page, cap):
         else:
             open_button.disabled = True
             add_button.disabled = True
+            
+            # THIS IS THE START of the opening function of the door 
+
+                # Set up the serial connection
+            ser = serial.Serial('COM4', 9600, timeout=1)  # Replace 'COM3' with your serial port
+            
+            # Allow the connection to initialize
+            time.sleep(2)
+            
+            # Send the "Open" message
+            ser.write(b'open')  # 'b' is for sending bytes
+            
+            # Close the serial connection
+            ser.close()
+            # THIS IS THE END of the opening function of the door
 
         # Convert the frame to an image that Flet can display
-        _, buffer = cv2.imencode('.png', frame)
+        _, buffer = cv2.imencode('.jpg', frame)
         img_str = base64.b64encode(buffer).decode('utf-8')
         video_container.content = ft.Image(src_base64=img_str)
         
         # Ensure the page updates immediately
         await page.update_async()
-
+        known_face_encodings, known_face_names = load_image(folder_path)
         # Wait for a short period to limit the frame rate (adjust for smoother video)
-        await asyncio.sleep(0.005)
+        await asyncio.sleep(0.0005)
 
     cap.release()
     
-# ft.app(target=process_gui)
+ft.app(target=process_gui)
 
 # ###################################  
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    runChoice = input("Would you rather Terminal or GUI?\nType in your choice\n")
-    if runChoice.lower() == "terminal":
-        processTerminal()
-    elif runChoice.lower() == "gui":
-        ft.app(target=process_gui)
-    else:
-        print("Please enter a valid choice")
+#     runChoice = input("Would you rather Terminal or GUI?\nType in your choice\n")
+#     if runChoice.lower() == "terminal":
+#         processTerminal()
+#     elif runChoice.lower() == "gui":
+#         ft.app(target=process_gui)
+#     else:
+#         print("Please enter a valid choice")
     
-    # Release the capture and close windows
-    cam.release()
-    cv2.destroyAllWindows()
+#     # Release the capture and close windows
+#     cam.release()
+#     cv2.destroyAllWindows()
