@@ -630,7 +630,7 @@ async def update_frame(video_container, page, cap):
         else:
             open_button.disabled = True
             add_button.disabled = True
-            
+
             # THIS IS THE START of the opening function of the door 
 
                 # Set up the serial connection
@@ -658,21 +658,19 @@ async def update_frame(video_container, page, cap):
         await asyncio.sleep(0.0005)
 
     cap.release()
+
+###################################  
+
+if __name__ == "__main__":
+
+    runChoice = input("Would you rather Terminal or GUI?\nType in your choice\n")
+    if runChoice.lower() == "terminal":
+        processTerminal()
+    elif runChoice.lower() == "gui":
+        ft.app(target=process_gui)
+    else:
+        print("Please enter a valid choice")
     
-ft.app(target=process_gui)
-
-# ###################################  
-
-# if __name__ == "__main__":
-
-#     runChoice = input("Would you rather Terminal or GUI?\nType in your choice\n")
-#     if runChoice.lower() == "terminal":
-#         processTerminal()
-#     elif runChoice.lower() == "gui":
-#         ft.app(target=process_gui)
-#     else:
-#         print("Please enter a valid choice")
-    
-#     # Release the capture and close windows
-#     cam.release()
-#     cv2.destroyAllWindows()
+    # Release the capture and close windows
+    cam.release()
+    cv2.destroyAllWindows()
