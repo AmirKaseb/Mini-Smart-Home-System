@@ -6,13 +6,14 @@ import flet as ft
 import base64
 import serial 
 import time
-# from io import BytesIO
+import subprocess
 import asyncio
+import threading
 
 ###################################
 # Initialization 
 
-folder_path = Path(r"./Database")  # Default directory
+folder_path = Path(r"Computervision/Database")  # Default directory
 cam = cv2.VideoCapture(0)
 
 ###################################
@@ -206,7 +207,7 @@ async def process_gui(page: ft.Page):
             alignment=ft.MainAxisAlignment.CENTER
         )
         main_column = ft.Column(
-            controls=[video_container, button_row1, button_row2, button_row3],
+            controls=[video_container, button_row1, button_row2, button_row3, logo],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER
         )
@@ -544,7 +545,7 @@ async def process_gui(page: ft.Page):
 
         req_layout(password_field, submit_button, back_button)
 
-    button_width = 150
+    button_width = 260
     # Create buttons
     open_button = ft.ElevatedButton(
         text="Open Door",
@@ -586,7 +587,15 @@ async def process_gui(page: ft.Page):
 
     # Create a video container
     global video_container
-    video_container = ft.Container(width=310, height=240)
+    video_container = ft.Container(width=600, height=400)
+
+    global logo
+    logo = ft.Image(
+        src=f"Computervision\Team-Logo.jpeg",
+        width=200,
+        height=200,
+        fit=ft.ImageFit.CONTAIN,
+    )
 
     home_layout()
 
@@ -659,18 +668,13 @@ async def update_frame(video_container, page, cap):
 
     cap.release()
 
-###################################  
+# def open_serial_monitor():
+    # Run the serial_monitor.py script automatically
+    # subprocess.Popen(['python', 'serial_monitor.py'])
 
-if __name__ == "__main__":
+# # Call this function at the start of your main code
+# if __name__ == "__main__":
+#     open_serial_monitor()
+ft.app(target=process_gui)
 
-    runChoice = input("Would you rather Terminal or GUI?\nType in your choice\n")
-    if runChoice.lower() == "terminal":
-        processTerminal()
-    elif runChoice.lower() == "gui":
-        ft.app(target=process_gui)
-    else:
-        print("Please enter a valid choice")
-    
-    # Release the capture and close windows
-    cam.release()
-    cv2.destroyAllWindows()
+
