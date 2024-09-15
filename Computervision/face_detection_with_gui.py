@@ -4,6 +4,7 @@ import cv2
 import face_recognition
 import flet as ft
 import base64
+# from io import BytesIO
 import asyncio
 
 ###################################
@@ -290,19 +291,46 @@ async def process_gui(page: ft.Page):
                 page.update()
             else:
                 show_bottom_sheet(page, "Error: No name entered.")
+                
+        def back_handler(e):
+            # Re-add the buttons after the process is done
+            page.controls.clear()  # Clear all controls again
+            # Center the video container and buttons
+            button_row1 = ft.Row(
+                controls=[open_button_container, add_button_container],
+                alignment=ft.MainAxisAlignment.CENTER
+            )
+            button_row2 = ft.Row(
+                controls=[delete_button_container, reset_button_container],
+                alignment=ft.MainAxisAlignment.CENTER
+            )
+            main_column = ft.Column(
+                controls=[video_container, button_row1, button_row2],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+
+            # Add the main column to the page
+            page.add(main_column)
+            page.update()
 
         # Add the input field and submit button to the page
         submit_button = ft.ElevatedButton("Submit", on_click=submit_handler)
-
+        back_button = ft.ElevatedButton("Back", on_click=back_handler)
+        
         # Create a row for buttons and ensure the row is centered
-        button_row = ft.Row(
+        button_row1 = ft.Row(
             controls=[submit_button],
+            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
+        )
+        button_row2 = ft.Row(
+            controls=[back_button],
             alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
         )
 
         # Organize the video container, dropdown, and button in a centered column
         main_column = ft.Column(
-            controls=[video_container, name_field, button_row],
+            controls=[video_container, name_field, button_row1, button_row2],
             alignment=ft.MainAxisAlignment.CENTER,  # Center the column vertically
             horizontal_alignment=ft.CrossAxisAlignment.CENTER  # Center the column horizontally
         )
@@ -378,19 +406,45 @@ async def process_gui(page: ft.Page):
                 page.open(dlg_modal)  # Open the modal dialog for confirmation
             else:
                 show_bottom_sheet(page, "Please select a person to delete.")  # Show a message if no name is selected
+                
+        def back_handler(e):
+            # Re-add the buttons after the process is done
+            page.controls.clear()  # Clear all controls again
+            # Center the video container and buttons
+            button_row1 = ft.Row(
+                controls=[open_button_container, add_button_container],
+                alignment=ft.MainAxisAlignment.CENTER
+            )
+            button_row2 = ft.Row(
+                controls=[delete_button_container, reset_button_container],
+                alignment=ft.MainAxisAlignment.CENTER
+            )
+            main_column = ft.Column(
+                controls=[video_container, button_row1, button_row2],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+            
+            # Add the main column to the page
+            page.add(main_column)
+            page.update()
 
         # Add the dropdown and submit button to the page
         submit_button = ft.ElevatedButton("Submit", on_click=submit_handler)
-
+        back_button = ft.ElevatedButton("Back", on_click=back_handler)
+        
         # Create a row for buttons and ensure the row is centered
-        button_row = ft.Row(
+        button_row1 = ft.Row(
             controls=[submit_button],
             alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
         )
-
+        button_row2 = ft.Row(
+            controls=[back_button],
+            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
+        )
         # Organize the video container, dropdown, and button in a centered column
         main_column = ft.Column(
-            controls=[video_container, dropdown, button_row],
+            controls=[video_container, dropdown, button_row1, button_row2],
             alignment=ft.MainAxisAlignment.CENTER,  # Center the column vertically
             horizontal_alignment=ft.CrossAxisAlignment.CENTER  # Center the column horizontally
         )
@@ -482,21 +536,47 @@ async def process_gui(page: ft.Page):
             else:
                 # Show the bottom sheet if no password is entered
                 show_bottom_sheet(page, "Please type in a password.")
+                
+        def back_handler(e):
+            # Re-add the buttons after the process is done
+            page.controls.clear()  # Clear all controls again
+            # Center the video container and buttons
+            button_row1 = ft.Row(
+                controls=[open_button_container, add_button_container],
+                alignment=ft.MainAxisAlignment.CENTER
+            )
+            button_row2 = ft.Row(
+                controls=[delete_button_container, reset_button_container],
+                alignment=ft.MainAxisAlignment.CENTER
+            )
+            main_column = ft.Column(
+                controls=[video_container, button_row1, button_row2],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+            
+            # Add the main column to the page
+            page.add(main_column)
+            page.update()
 
         # Add the password input field and submit button to the page
         password_field = ft.TextField(label="Enter Password", width=310)
         # Add the dropdown and submit button to the page
         submit_button = ft.ElevatedButton("Submit", on_click=submit_handler)
+        back_button = ft.ElevatedButton("Back", on_click=back_handler)
 
         # Create a row for buttons and ensure the row is centered
-        button_row = ft.Row(
+        button_row1 = ft.Row(
             controls=[submit_button],
             alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
         )
-
+        button_row2 = ft.Row(
+            controls=[back_button],
+            alignment=ft.MainAxisAlignment.CENTER  # Ensure the button row is centered
+        )
         # Organize the video container, dropdown, and button in a centered column
         main_column = ft.Column(
-            controls=[video_container, password_field, button_row],
+            controls=[video_container, password_field, button_row1, button_row2],
             alignment=ft.MainAxisAlignment.CENTER,  # Center the column vertically
             horizontal_alignment=ft.CrossAxisAlignment.CENTER  # Center the column horizontally
         )
@@ -613,8 +693,10 @@ async def update_frame(video_container, page, cap):
         await asyncio.sleep(0.005)
 
     cap.release()
+    
+# ft.app(target=process_gui)
 
-###################################  
+# ###################################  
 
 if __name__ == "__main__":
 
